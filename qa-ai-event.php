@@ -35,9 +35,9 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	exit;
 }
 
-require_once QA_INCLUDE_DIR.'qa-db-metas.php';
+require_once QA_INCLUDE_DIR.'db/metas.php';
 
-class qa_tp_event
+class qa_ai_event
 {
     function process_event ($event, $userid, $handle, $cookieid, $params)
     {

@@ -35,7 +35,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	header('Location: ../../');
 	exit;
 }
-require_once QA_INCLUDE_DIR.'qa-filter-basic.php';
+require_once QA_INCLUDE_DIR.'plugins/qa-filter-basic.php';
 
 class qa_ai_filter
 {

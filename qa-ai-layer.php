@@ -32,7 +32,8 @@
 
 class qa_html_theme_layer extends qa_html_theme_base
 {
-    private $image_names;
+    private $imageNames;
+    private $hasImagesOnPage;
 
     /**
      * Since this is called first, let's initialise our data now
@@ -40,25 +41,21 @@ class qa_html_theme_layer extends qa_html_theme_base
 	function doctype() {
         qa_html_theme_base::doctype();
 
-        $this->image_names = array();
-        for ($i = 1; $i <= 10; $i++)
-            $this->image_names[] = "attached_image_$i";
+        $this->imageNames = array();
+        $this->hasImagesOnPage = false;
 
-        if($this->template == 'question')
+        for ($i = 1; $i <= 10; $i++)
+            $this->imageNames[] = "attached_image_$i";
+
+        if(isset($this->content['q_view']['raw']['postid']))
         {
-            if(isset($this->content['q_view']['raw']['postid']))
-            {
-                $this->content['q_view']['images'] = $this->getImagesObjectsFor($this->content['q_view']['raw']['postid']);
-            }
+            $this->content['q_view']['images'] = $this->getImagesObjectsFor($this->content['q_view']['raw']['postid']);
         }
 
-        if($this->template == 'questions')
+        if (!empty($this->content['q_list']['qs']))
         {
-            if (!empty($this->content['q_list']['qs']))
-            {
-                foreach ($this->content['q_list']['qs'] as $k => $aQuestion)
-                    $this->content['q_list']['qs'][$k]['images'] = $this->getImagesObjectsFor($this->content['q_list']['qs'][$k]['raw']['postid']);
-            }
+            foreach ($this->content['q_list']['qs'] as $k => $aQuestion)
+                $this->content['q_list']['qs'][$k]['images'] = $this->getImagesObjectsFor($this->content['q_list']['qs'][$k]['raw']['postid']);
         }
     }
 
@@ -70,7 +67,7 @@ class qa_html_theme_layer extends qa_html_theme_base
 	function head_script() {
 		qa_html_theme_base::head_script();
 
-        if($this->template == 'question' || $this->template == 'questions')
+        if($this->hasImagesOnPage)
         {
             $this->output('<script type="text/javascript" src="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/jquery.magnific-popup.min.js"></script>');
             $this->output('<script type="text/javascript">');
@@ -98,7 +95,7 @@ class qa_html_theme_layer extends qa_html_theme_base
 	function head_css() {
 		qa_html_theme_base::head_css();
 
-        if($this->template == 'question' || $this->template == 'questions')
+        if($this->hasImagesOnPage)
         {
             $this->output('<link rel="stylesheet" TYPE="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/magnific-popup.css"/>');
             $this->output('<link rel="stylesheet" type="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'css/qa-ai-styles.css" />');
@@ -211,8 +208,9 @@ class qa_html_theme_layer extends qa_html_theme_base
     private function getImagesObjectsFor($postId)
     {
         $images = array();
+        require_once QA_INCLUDE_DIR . 'app/blobs.php';
 
-        $blobIds = qa_db_single_select(qa_db_post_meta_selectspec($postId, $this->image_names));
+        $blobIds = qa_db_single_select(qa_db_post_meta_selectspec($postId, $this->imageNames));
         foreach($blobIds as $blobId)
         {
             if (qa_blob_exists($blobId))
@@ -231,6 +229,8 @@ class qa_html_theme_layer extends qa_html_theme_base
                                   'url' => $bloburl,
                                   'isImage' => $bIsImage,
                                   'filename' => $filename);
+
+                $this->hasImagesOnPage = true;
             }
             else
             {
