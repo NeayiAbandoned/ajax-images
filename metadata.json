@@ -1,0 +1,11 @@
+{
+	"name": "Ajax Images",
+	"description": "Allows to attach images to a question, resizing them on the browser (nice for phones), and uploading them in ajax.",
+	"version": "1.0.0",
+	"date": "2019-07-26",
+	"author": "Neayi",
+	"author_uri": "http://neayi.com",
+	"license": "MIT",
+	"min_q2a": "1.8",
+	"load_order": "before_db_init"
+}
