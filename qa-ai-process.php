@@ -52,8 +52,9 @@ class qa_ai_process {
             }
             else
             {
-                echo "QA_AJAX_RESPONSE\n1\n";
-                // The blobid allows to show the image with the URL : http://localhost/neayi/question2answer/?qa=blob&qa_blobid=6748342318866642209
+				echo "QA_AJAX_RESPONSE\n1\n";
+
+                // The blobid allows to show the image with the URL : http://...question2answer/?qa=blob&qa_blobid=6748342318866642209
                 echo $result['blobid'] . "\n";
             }
 

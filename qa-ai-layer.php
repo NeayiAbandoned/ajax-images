@@ -115,25 +115,24 @@ class qa_html_theme_layer extends qa_html_theme_base
         if($this->template == 'ask')
         {
             $toto = $this->content['form'];
+
+            // TODO !!
         }
         else if(isset($this->content['form_q_edit']['fields']))
         {
-            $toto = $this->content['form_q_edit'];
-
             $this->content['form_q_edit']['fields']['test_tp'] = array();
-            $this->content['form_q_edit']['fields']['test_tp']['label'] = 'honk';
+            $this->content['form_q_edit']['fields']['test_tp']['label'] = '<strong>'.qa_lang_html( 'ajax-images/upload_images_label' ).'</strong>';
+
+            $isoutput = false;
+            $this->content['form_q_edit']['fields']['test_tp']['label'] .= $this->getImageListHTML($this->content['q_view']['images'], $isoutput);
+
             $this->content['form_q_edit']['fields']['test_tp']['type'] = 'custom';
-            $this->content['form_q_edit']['fields']['test_tp']['html'] = '<ul id="qa_ai_images_preview">The images will show up here:</ul><input type="file" id="qa-ai-fileupload" multiple>';
-            $this->content['form_q_edit']['fields']['test_tp']['note'] = 'honk';
+            $this->content['form_q_edit']['fields']['test_tp']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
+            $this->content['form_q_edit']['fields']['test_tp']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
 
             $titi = $this->content['q_view'];
 		}
 		qa_html_theme_base::main();
-    }
-    function q_view_content($q_view)
-    {
-        $this->output('q_view_content');
-        qa_html_theme_base::q_view_content($q_view);
     }
 
     /**
@@ -142,35 +141,18 @@ class qa_html_theme_layer extends qa_html_theme_base
 	public function q_item_content($q_item)
 	{
         qa_html_theme_base::q_item_content($q_item);
+        $isoutput = false;
+        $output = $this->getImageListHTML($q_item['images'], $isoutput);
 
-        $output = '<ul id="qa_ai_images_preview">';
-
-        foreach($q_item['images'] as $anImage)
-        {
-            $value = $anImage['filename'];
-            if($anImage['isImage'])
-            {
-                $value = '<img src="'.$anImage['url'].'" alt="'.$anImage['filename'].'" target="_blank"/>';
-                $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link qa-q-view-ai-form-img">' . $value . '</a>';
-            }
-            else // other types of files (PDF, ...)
-                $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link">' . $value . '</a>';
-
-            // todo: change all class names!
-            $output .= '<li class="qa-q-view-extra-content">'.$value.'</li>';
-		}
-
-        $output .= '</ul>';
         $this->output($output);
     }
 
     function q_view_extra($q_view)
-     {
-        $this->output('before q_view_extra');
+    {
         qa_html_theme_base::q_view_extra($q_view);
 
-        //if(!isset($this->content['form_q_edit']))
-		$this->qa_ai_outputImageGallery($q_view);
+        if (!empty($q_view['title']))
+            $this->qa_ai_outputImageGallery($q_view);
     }
 
     /**
@@ -178,31 +160,47 @@ class qa_html_theme_layer extends qa_html_theme_base
      */
     function qa_ai_outputImageGallery(&$q_view)
     {
-        $output = '<ul id="qa_ai_images_preview">The images will show up here:';
+        $isoutput = false;
+        $output = $this->getImageListHTML($q_view['images'], $isoutput);
 
-		$isoutput = false;
-        foreach($q_view['images'] as $anImage)
-        {
-            $value = $anImage['filename'];
-            if($anImage['isImage'])
-            {
-                $value = '<img src="'.$anImage['url'].'" alt="'.$anImage['filename'].'" target="_blank"/>';
-                $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link qa-q-view-ai-form-img">' . $value . '</a>';
-            }
-            else // other types of files (PDF, ...)
-                $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link">' . $value . '</a>';
-
-            // todo: change all class names!
-            $output .= '<li class="qa-q-view-extra-content">'.$value.'</li>';
-
-            $isoutput = true;
-		}
-
-        $output .= '</ul>';
         $this->output($output);
 
         if($isoutput)
 			$this->output('<div style="clear:both;"></div>');
+    }
+
+    /**
+     * Returns the HTML for the image list
+     */
+    private function getImageListHTML($images, &$isoutput)
+    {
+        $output = '<ul id="qa_ai_images_preview">';
+
+        $isoutput = false;
+        if (!empty($images))
+        {
+            foreach($images as $anImage)
+            {
+                $value = $anImage['filename'];
+                if($anImage['isImage'])
+                {
+                    $value = '<img src="'.$anImage['url'].'" alt="'.$anImage['filename'].'" target="_blank"/>';
+                    $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link qa-q-view-ai-form-img">' . $value . '</a>';
+                    $value .= '<input type="hidden" name="blobId[]" value="'.$anImage['blobId'].'">';
+                }
+                else // other types of files (PDF, ...)
+                    $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link">' . $value . '</a>';
+
+                // todo: change all class names!
+                $output .= '<li class="qa-q-view-extra-content">'.$value.'</li>';
+
+                $isoutput = true;
+            }
+        }
+
+        $output .= '</ul>';
+
+        return $output;
     }
 
     private function getImagesObjectsFor($postId)

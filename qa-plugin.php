@@ -60,3 +60,5 @@ qa_register_plugin_module('filter', 'qa-ai-filter.php', 'qa_ai_filter', 'Ajax Im
 
 // Register an event in order to actually save the blobids in the DB. Note that unused blobs will be deleted
 qa_register_plugin_module('event', 'qa-ai-event.php', 'qa_ai_event', 'Ajax Images');
+
+qa_register_plugin_phrases( 'lang/ajax-images-lang-*.php', 'ajax-images' );
