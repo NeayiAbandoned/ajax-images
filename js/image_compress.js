@@ -58,7 +58,6 @@ function compress(e)
                             type: 'image/jpeg',
                             lastModified: Date.now()
                         });
-                        console.log(file);
 
                         var img = document.createElement("img");
                         img.file = file;
@@ -143,8 +142,6 @@ function FileUpload(info, file, fileName, blobIdInput)
                 {
                     var BlobId = lines[1];
                     blobIdInput.value = BlobId;
-
-                    // qa_conceal(document.getElementById('notice_' + ens[1]), 'notice');
                 }
                 else if (lines[0] == '0')
                     alert(lines[1]);
@@ -181,3 +178,51 @@ function FileUpload(info, file, fileName, blobIdInput)
 document.getElementById("qa-ai-fileupload").addEventListener("change", function (event) {
     compress(event);
 });
+
+function removeAjaxImage(button, blobId)
+{
+    qa_show_waiting_after(button, false);
+
+    var xhr = new XMLHttpRequest();
+
+    // When the ajax request is completed, we can parse the data sent back
+    // with the ID of the new image.
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4)
+        {
+            var header = 'QA_AJAX_RESPONSE';
+            var headerpos = xhr.response.indexOf(header);
+
+            if (headerpos >= 0)
+            {
+                var lines = xhr.response.substr(headerpos + header.length).replace(/^\s+/, '').split("\n");
+                if (lines[0] == '1')
+                {
+                    qa_hide_waiting(button);
+                    button.parentNode.remove();
+                }
+                else if (lines[0] == '0')
+                    alert(lines[1]);
+            }
+            else
+                qa_ajax_error();
+        }
+    }
+
+    // Prepare the ajax request, using POST
+    xhr.open("POST", "index.php");
+
+    // Build a form data object in order to store the values in different mime parts
+    var formData = new FormData();
+
+    // qa == ajax --> route to the ajax handler in index.php
+    formData.append("qa", "ajax");
+
+    // This will tell our specific code (in qa-tp_process.php to handle the image upload)
+    formData.append("delete_image", blobId);
+
+    // Now that our form data is complete, send it through:
+    xhr.send(formData);
+
+    return false;
+}

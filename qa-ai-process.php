@@ -57,7 +57,16 @@ class qa_ai_process {
                 // The blobid allows to show the image with the URL : http://...question2answer/?qa=blob&qa_blobid=6748342318866642209
                 echo $result['blobid'] . "\n";
             }
+		}
 
+        $delete_image = qa_post_text('delete_image');
+
+        if (!empty($delete_image))
+        {
+			require_once QA_INCLUDE_DIR . 'app/blobs.php';
+			qa_delete_blob($delete_image); // does not return anything
+
+			echo "QA_AJAX_RESPONSE\n1";
         }
     }
 }

@@ -33,7 +33,6 @@
 class qa_html_theme_layer extends qa_html_theme_base
 {
     private $imageNames;
-    private $hasImagesOnPage;
 
     /**
      * Since this is called first, let's initialise our data now
@@ -42,7 +41,6 @@ class qa_html_theme_layer extends qa_html_theme_base
         qa_html_theme_base::doctype();
 
         $this->imageNames = array();
-        $this->hasImagesOnPage = false;
 
         for ($i = 1; $i <= 10; $i++)
             $this->imageNames[] = "attached_image_$i";
@@ -67,44 +65,38 @@ class qa_html_theme_layer extends qa_html_theme_base
 	function head_script() {
 		qa_html_theme_base::head_script();
 
-        if($this->hasImagesOnPage)
-        {
-            $this->output('<script type="text/javascript" src="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/jquery.magnific-popup.min.js"></script>');
-            $this->output('<script type="text/javascript">');
-            $this->output('$(function(){');
-            $this->output('	$(".qa-q-view-ai-list-img, .qa-q-view-ai-form-img").magnificPopup({');
-            $this->output('		type: \'image\',');
-            $this->output('		tError: \'<a href="%url%">The image</a> could not be loaded.\',');
-            $this->output('		image: {');
-            $this->output('			titleSrc: \'title\'');
-            $this->output('		},');
-            $this->output('		gallery: {');
-            $this->output('			enabled: true');
-            $this->output('		},');
-            $this->output('		callbacks: {');
-            $this->output('			elementParse: function(item) {');
-            $this->output('				console.log(item);');
-            $this->output('			}');
-            $this->output('		}');
-            $this->output('	});');
-            $this->output('});');
-            $this->output('</script>');
-        }
+        $this->output('<script type="text/javascript" src="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/jquery.magnific-popup.min.js"></script>');
+        $this->output('<script type="text/javascript">');
+        $this->output('$(function(){');
+        $this->output('	$(".qa-q-view-ai-list-img, .qa-q-view-ai-form-img").magnificPopup({');
+        $this->output('		type: \'image\',');
+        $this->output('		tError: \'<a href="%url%">The image</a> could not be loaded.\',');
+        $this->output('		image: {');
+        $this->output('			titleSrc: \'title\'');
+        $this->output('		},');
+        $this->output('		gallery: {');
+        $this->output('			enabled: true');
+        $this->output('		},');
+        $this->output('		callbacks: {');
+        $this->output('			elementParse: function(item) {');
+        $this->output('				console.log(item);');
+        $this->output('			}');
+        $this->output('		}');
+        $this->output('	});');
+        $this->output('});');
+        $this->output('</script>');
     }
 
 	function head_css() {
 		qa_html_theme_base::head_css();
 
-        if($this->hasImagesOnPage)
-        {
-            $this->output('<link rel="stylesheet" TYPE="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/magnific-popup.css"/>');
-            $this->output('<link rel="stylesheet" type="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'css/qa-ai-styles.css" />');
-        }
+        $this->output('<link rel="stylesheet" TYPE="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'magnific-popup/magnific-popup.css"/>');
+        $this->output('<link rel="stylesheet" type="text/css" href="'.QA_HTML_THEME_LAYER_URLTOROOT.'css/qa-ai-styles.css" />');
 	}
 
     function body_footer()
     {
-        if(isset($this->content['form_q_edit']['fields'])) // check it's a question page
+        if($this->template == 'ask' || isset($this->content['form_q_edit']['fields'])) // check it's a question page
             $this->content['body_footer'] = '<script src="' . qa_html(QA_HTML_THEME_LAYER_URLTOROOT . 'js/image_compress.js') . '" type="text/javascript"></script>';
 
         qa_html_theme_base::body_footer();
@@ -112,25 +104,31 @@ class qa_html_theme_layer extends qa_html_theme_base
 
     function main()
     {
-        if($this->template == 'ask')
+        if ($this->template == 'ask')
         {
             $toto = $this->content['form'];
 
-            // TODO !!
+            $this->content['form']['fields']['upload_images'] = array();
+            $this->content['form']['fields']['upload_images']['label'] = '<strong>'.qa_lang_html( 'ajax-images/upload_images_label' ).'</strong>';
+
+            $isoutput = false;
+            $this->content['form']['fields']['upload_images']['label'] .= $this->getImageListHTML(array(), $isoutput, true);
+
+            $this->content['form']['fields']['upload_images']['type'] = 'custom';
+            $this->content['form']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
+            $this->content['form']['fields']['upload_images']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
         }
         else if(isset($this->content['form_q_edit']['fields']))
         {
-            $this->content['form_q_edit']['fields']['test_tp'] = array();
-            $this->content['form_q_edit']['fields']['test_tp']['label'] = '<strong>'.qa_lang_html( 'ajax-images/upload_images_label' ).'</strong>';
+            $this->content['form_q_edit']['fields']['upload_images'] = array();
+            $this->content['form_q_edit']['fields']['upload_images']['label'] = '<strong>'.qa_lang_html( 'ajax-images/upload_images_label' ).'</strong>';
 
             $isoutput = false;
-            $this->content['form_q_edit']['fields']['test_tp']['label'] .= $this->getImageListHTML($this->content['q_view']['images'], $isoutput);
+            $this->content['form_q_edit']['fields']['upload_images']['label'] .= $this->getImageListHTML($this->content['q_view']['images'], $isoutput, true);
 
-            $this->content['form_q_edit']['fields']['test_tp']['type'] = 'custom';
-            $this->content['form_q_edit']['fields']['test_tp']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
-            $this->content['form_q_edit']['fields']['test_tp']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
-
-            $titi = $this->content['q_view'];
+            $this->content['form_q_edit']['fields']['upload_images']['type'] = 'custom';
+            $this->content['form_q_edit']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
+            $this->content['form_q_edit']['fields']['upload_images']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
 		}
 		qa_html_theme_base::main();
     }
@@ -172,9 +170,12 @@ class qa_html_theme_layer extends qa_html_theme_base
     /**
      * Returns the HTML for the image list
      */
-    private function getImageListHTML($images, &$isoutput)
+    private function getImageListHTML($images, &$isoutput, $bEditMode = false)
     {
         $output = '<ul id="qa_ai_images_preview">';
+        $extraClasses = '';
+        if ($bEditMode)
+            $extraClasses = 'ajax-editable';
 
         $isoutput = false;
         if (!empty($images))
@@ -184,9 +185,12 @@ class qa_html_theme_layer extends qa_html_theme_base
                 $value = $anImage['filename'];
                 if($anImage['isImage'])
                 {
-                    $value = '<img src="'.$anImage['url'].'" alt="'.$anImage['filename'].'" target="_blank"/>';
+                    $value = '<img class="'.$extraClasses.'" src="'.$anImage['url'].'" alt="'.$anImage['filename'].'" target="_blank"/>';
                     $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link qa-q-view-ai-form-img">' . $value . '</a>';
                     $value .= '<input type="hidden" name="blobId[]" value="'.$anImage['blobId'].'">';
+
+                    if ($bEditMode) // we add a button to remove the image
+                        $value .= '<a class="glyphicon glyphicon-remove-circle" aria-hidden="true" onclick="removeAjaxImage(this, \''.$anImage['blobId'].'\');"></a>';
                 }
                 else // other types of files (PDF, ...)
                     $value = '<a href="'.$anImage['url'].'" class="qa-q-view-extra-link">' . $value . '</a>';
@@ -227,8 +231,6 @@ class qa_html_theme_layer extends qa_html_theme_base
                                   'url' => $bloburl,
                                   'isImage' => $bIsImage,
                                   'filename' => $filename);
-
-                $this->hasImagesOnPage = true;
             }
             else
             {
