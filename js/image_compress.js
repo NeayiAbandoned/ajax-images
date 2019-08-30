@@ -78,14 +78,8 @@ function compress(e)
                         info.innerHTML = "0%";
                         li.appendChild(info);
 
-                        var hiddenBlobIDInput = document.createElement("input");
-                        hiddenBlobIDInput.setAttribute('type', 'hidden');
-                        hiddenBlobIDInput.name = 'blobId[]';
-                        hiddenBlobIDInput.value = "0";
-                        li.appendChild(hiddenBlobIDInput);
-
                         // Now start uploading the file:
-                        new FileUpload(info, img.file, fileName, hiddenBlobIDInput);
+                        new FileUpload(info, img.file, fileName);
 
                     }, 'image/jpeg', 1);
                 },
@@ -101,14 +95,16 @@ function compress(e)
  * @param {*} info a DOM element which we will update with the upload progress
  * @param {*} file a File object that we will upload
  * @param {*} fileName the original filename of the file
- * @param {*} blobIdInput a DOM hidden input that we will use to store the blobId
  *
  * @see https://developer.mozilla.org/fr/docs/Web/API/File/Using_files_from_web_applications
  *
  */
-function FileUpload(info, file, fileName, blobIdInput)
+function FileUpload(info, file, fileName)
 {
     qa_show_waiting_after(info, false);
+
+    // Disable the save button:
+    $('.qa-form-tall-button-save').attr("disabled", true);
 
     var xhr = new XMLHttpRequest();
 
@@ -140,11 +136,24 @@ function FileUpload(info, file, fileName, blobIdInput)
                 var lines = xhr.response.substr(headerpos + header.length).replace(/^\s+/, '').split("\n");
                 if (lines[0] == '1')
                 {
+                    //  Create a DOM hidden input that we will use to store the blobId
+
+                    var hiddenBlobIDInput = document.createElement("input");
+                    hiddenBlobIDInput.setAttribute('type', 'hidden');
+                    hiddenBlobIDInput.name = 'blobId[]';
+                    hiddenBlobIDInput.value = "0";
+                    info.parentNode.appendChild(hiddenBlobIDInput);
+
                     var BlobId = lines[1];
-                    blobIdInput.value = BlobId;
+                    hiddenBlobIDInput.value = BlobId;
                 }
                 else if (lines[0] == '0')
+                {
                     alert(lines[1]);
+                    info.parentNode.remove();
+                }
+
+                $('.qa-form-tall-button-save').removeAttr("disabled");
             }
             else
                 qa_ajax_error();

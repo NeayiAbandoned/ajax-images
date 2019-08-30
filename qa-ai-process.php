@@ -48,10 +48,11 @@ class qa_ai_process {
 
             if(isset($result['error']))
             {
-                echo "QA_AJAX_RESPONSE\n0\nCould not upload the file\n";
+                echo "QA_AJAX_RESPONSE\n0\nCould not upload the file: ".$result['error']."\n";
             }
             else
             {
+				// Success:
 				echo "QA_AJAX_RESPONSE\n1\n";
 
                 // The blobid allows to show the image with the URL : http://...question2answer/?qa=blob&qa_blobid=6748342318866642209
