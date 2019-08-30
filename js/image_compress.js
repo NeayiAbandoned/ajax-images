@@ -105,6 +105,7 @@ function FileUpload(info, file, fileName)
 
     // Disable the save button:
     $('.qa-form-tall-button-save').attr("disabled", true);
+    $('.qa-form-tall-button-ask').attr("disabled", true);
 
     var xhr = new XMLHttpRequest();
 
@@ -153,7 +154,9 @@ function FileUpload(info, file, fileName)
                     info.parentNode.remove();
                 }
 
+                // Enable the submit button even if the upload failed
                 $('.qa-form-tall-button-save').removeAttr("disabled");
+                $('.qa-form-tall-button-ask').removeAttr("disabled");
             }
             else
                 qa_ajax_error();

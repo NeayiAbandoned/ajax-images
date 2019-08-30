@@ -42,6 +42,8 @@ class qa_ai_process {
 
             require_once QA_INCLUDE_DIR . 'app/cookies.php';
             require_once QA_INCLUDE_DIR . 'app/upload.php';
+			require_once QA_INCLUDE_DIR . 'app/options.php';
+			require_once QA_INCLUDE_DIR . 'db/selects.php';
 
         	$file = reset($_FILES);
             $result = qa_upload_file($file['tmp_name'], $filename);
