@@ -115,7 +115,7 @@ class qa_html_theme_layer extends qa_html_theme_base
             $this->content['form']['fields']['upload_images']['label'] .= $this->getImageListHTML(array(), $isoutput, true);
 
             $this->content['form']['fields']['upload_images']['type'] = 'custom';
-            $this->content['form']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
+            $this->content['form']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" accept="image/*" multiple>';
             $this->content['form']['fields']['upload_images']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
         }
         else if(isset($this->content['form_q_edit']['fields']))
@@ -127,7 +127,7 @@ class qa_html_theme_layer extends qa_html_theme_base
             $this->content['form_q_edit']['fields']['upload_images']['label'] .= $this->getImageListHTML($this->content['q_view']['images'], $isoutput, true);
 
             $this->content['form_q_edit']['fields']['upload_images']['type'] = 'custom';
-            $this->content['form_q_edit']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" multiple>';
+            $this->content['form_q_edit']['fields']['upload_images']['html'] = '<input type="file" id="qa-ai-fileupload" accept="image/*" multiple>';
             $this->content['form_q_edit']['fields']['upload_images']['note'] = '<i>'.qa_lang_html( 'ajax-images/upload_images_notes' ).'</i>';
 		}
 		qa_html_theme_base::main();
