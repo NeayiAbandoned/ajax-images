@@ -50,29 +50,31 @@ class qa_ai_event
             case 'q_queue':
             case 'q_post':
             case 'q_edit':
-                $existing_images = qa_db_single_select(qa_db_post_meta_selectspec($params['postid'], $image_names));
-                $removed_images = array();
-
-                // remove all meta first (not very efficient but at least allows to keep the images in a sequential order)
-                qa_db_postmeta_clear($params['postid'], $image_names);
-
-                foreach ($GLOBALS['UploadedBlobIds'] as $k => $BlobId)
+                if (isset($GLOBALS['UploadedBlobIds']))
                 {
-                    qa_db_postmeta_set($params['postid'], $image_names[$k], $BlobId);
-                }
+                    $existing_images = qa_db_single_select(qa_db_post_meta_selectspec($params['postid'], $image_names));
+                    $removed_images = array();
 
-                require_once QA_INCLUDE_DIR . 'app/blobs.php';
+                    // remove all meta first (not very efficient but at least allows to keep the images in a sequential order)
+                    qa_db_postmeta_clear($params['postid'], $image_names);
 
-                foreach ($existing_images as $existingBlobId)
-                {
-                    if (!in_array($existingBlobId, $GLOBALS['UploadedBlobIds']))
+                    foreach ($GLOBALS['UploadedBlobIds'] as $k => $BlobId)
                     {
-                        qa_delete_blob($existingBlobId);
+                        qa_db_postmeta_set($params['postid'], $image_names[$k], $BlobId);
+                    }
+
+                    require_once QA_INCLUDE_DIR . 'app/blobs.php';
+
+                    foreach ($existing_images as $existingBlobId)
+                    {
+                        if (!in_array($existingBlobId, $GLOBALS['UploadedBlobIds']))
+                        {
+                            qa_delete_blob($existingBlobId);
+                        }
                     }
                 }
-
-
                 break;
+
             case 'q_delete':
                 // Todo : Delete the blobs
 
