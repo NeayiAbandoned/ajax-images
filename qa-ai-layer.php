@@ -104,10 +104,8 @@ class qa_html_theme_layer extends qa_html_theme_base
 
     function main()
     {
-        if ($this->template == 'ask')
+        if ($this->template == 'ask' && isset($this->content['form']))
         {
-            $toto = $this->content['form'];
-
             $this->content['form']['fields']['upload_images'] = array();
             $this->content['form']['fields']['upload_images']['label'] = '<strong>'.qa_lang_html( 'ajax-images/upload_images_label' ).'</strong>';
 
