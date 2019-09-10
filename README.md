@@ -11,5 +11,5 @@ Main features:
 
 Todo:
 * Option to decide the max size of a file (currently hardcoded)
-* Block the form submit button while the image is being uploaded
 * Impose a limit to 10 images (upload), 3 images (list view)
+* Replace the file input with something a little nicer
